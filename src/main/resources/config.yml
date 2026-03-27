@@ -1,0 +1,215 @@
+# ============================================================
+#  FantasyRaces - config.yml
+# ============================================================
+# All races, abilities, and conditions are defined here.
+# You can add as many races as you want.
+#
+# STAT MODIFIERS:
+#   max-health     : bonus hearts (added to 20 base). Can be negative.
+#   speed          : movement speed modifier (0.0 = no change, 0.1 = +10%)
+#   damage         : damage multiplier bonus (0.0 = no change, 0.2 = +20% dmg)
+#   knockback-resistance: 0.0 to 1.0
+#
+# PASSIVE ABILITIES (list as many as you want):
+#   - type: NIGHT_VISION       # permanent night vision
+#   - type: FIRE_RESISTANCE    # permanent fire resistance
+#   - type: WATER_BREATHING    # permanent water breathing
+#   - type: REGEN              # permanent regeneration (amp: 0 = regen I)
+#       amp: 0
+#   - type: STRENGTH           # permanent strength
+#       amp: 0
+#   - type: HASTE              # permanent haste
+#       amp: 0
+#   - type: SLOW_FALLING       # permanent slow falling
+#   - type: GLOWING            # permanent glowing (visible through walls)
+#   - type: SATURATION         # never gets hungry
+#
+# CONDITIONS:
+#   Conditions grant or remove effects based on world/environment state.
+#   Each condition has a 'trigger' and an 'effect'.
+#
+#   TRIGGERS:
+#     BELOW_Y:      true when player Y < value
+#     ABOVE_Y:      true when player Y > value
+#     IS_DAYTIME:   true during the day
+#     IS_NIGHTTIME: true at night
+#     IN_WATER:     true when submerged
+#     ON_FIRE:      true when burning
+#     IN_BIOME:     true when in listed biomes
+#       biomes: [DESERT, BADLANDS]
+#     WORLD_NAME:   true when in specified world
+#       world: world_nether
+#
+#   EFFECT types (same as passive abilities above, plus):
+#     DARKNESS      : applies Darkness effect
+#     BLINDNESS     : applies Blindness effect
+#     WEAKNESS      : applies Weakness effect
+#     SLOWNESS      : applies Slowness effect
+#     MINING_FATIGUE: applies Mining Fatigue
+#     POISON        : applies Poison (use carefully)
+#     REMOVE_EFFECT : removes a specific effect
+#       remove: NIGHT_VISION
+#
+# LUCKPERMS:
+#   luckperms-group: (optional) name of a LuckPerms group.
+#     When a player selects this race, they are ADDED to this group.
+#     When they change race, they are REMOVED from the old race group.
+#
+# SETTINGS:
+#   allow-reselect: can players change their race after first pick?
+#   reselect-cooldown: seconds between race changes (0 = no cooldown)
+# ============================================================
+
+settings:
+  allow-reselect: true
+  reselect-cooldown: 86400  # 24 hours in seconds (0 to disable)
+  default-race: human        # race assigned on first join (use 'none' to prompt)
+  broadcast-on-select: true  # announce race choice to server?
+  luckperms-sync: true       # enable LuckPerms group syncing?
+
+messages:
+  prefix: "&8[&6Races&8] &r"
+  selected: "&aYou are now a &e{race}&a!"
+  already-selected: "&cYou are already a &e{race}&c!"
+  cooldown: "&cYou must wait &e{time}&c before changing your race again."
+  unknown-race: "&cUnknown race: &e{race}&c. Use &f/race list&c to see available races."
+  no-permission: "&cYou don't have permission to do that."
+  race-info-header: "&6--- &e{race} &6---"
+  race-info-lp-group: "&7LuckPerms Group: &f{group}"
+  reload-success: "&aFantasyRaces reloaded successfully."
+  set-success: "&aSet &e{player}&a's race to &e{race}&a."
+  reset-success: "&aReset &e{player}&a's race."
+  broadcast-select: "&e{player} &ahas chosen the &e{race} &arace!"
+
+# ============================================================
+#  RACE DEFINITIONS
+# ============================================================
+
+races:
+
+  human:
+    display-name: "&fHuman"
+    description: "Adaptable and resilient. No special traits, but no weaknesses."
+    icon: PLAYER_HEAD   # Material name shown in future GUI expansions
+    luckperms-group: "race_human"
+    stats:
+      max-health: 0
+      speed: 0.0
+      damage: 0.0
+      knockback-resistance: 0.0
+    passives: []
+    conditions: []
+
+  elf:
+    display-name: "&aElf"
+    description: "Graceful forest dwellers with keen sight and swift movement."
+    icon: ARROW
+    luckperms-group: "race_elf"
+    stats:
+      max-health: -2       # 9 hearts — slightly fragile
+      speed: 0.05          # 5% faster
+      damage: 0.0
+      knockback-resistance: 0.0
+    passives:
+      - type: NIGHT_VISION
+    conditions:
+      - trigger: IS_NIGHTTIME
+        effect: HASTE
+        amp: 0             # Haste I at night
+
+  dwarf:
+    display-name: "&6Dwarf"
+    description: "Stout and mighty underground miners with iron resilience."
+    icon: IRON_PICKAXE
+    luckperms-group: "race_dwarf"
+    stats:
+      max-health: 4        # 12 hearts
+      speed: -0.03         # slightly slower
+      damage: 0.1          # +10% melee damage
+      knockback-resistance: 0.2
+    passives:
+      - type: HASTE
+        amp: 0
+    conditions:
+      - trigger: BELOW_Y
+        value: 30
+        effect: STRENGTH
+        amp: 0             # Strength I underground
+      - trigger: ABOVE_Y
+        value: 100
+        effect: WEAKNESS
+        amp: 0             # Weakness above ground (sunlight sensitivity)
+
+  orc:
+    display-name: "&2Orc"
+    description: "Brutal warriors with immense strength but poor defense against magic."
+    icon: IRON_SWORD
+    luckperms-group: "race_orc"
+    stats:
+      max-health: 6        # 13 hearts
+      speed: 0.0
+      damage: 0.25         # +25% damage
+      knockback-resistance: 0.1
+    passives:
+      - type: REGEN
+        amp: 0
+    conditions:
+      - trigger: ON_FIRE
+        effect: STRENGTH
+        amp: 1             # Strength II when burning (berserk)
+
+  undead:
+    display-name: "&5Undead"
+    description: "Risen from death. Immune to fire but cursed by sunlight."
+    icon: BONE
+    luckperms-group: "race_undead"
+    stats:
+      max-health: 0
+      speed: 0.0
+      damage: 0.0
+      knockback-resistance: 0.0
+    passives:
+      - type: FIRE_RESISTANCE
+      - type: WATER_BREATHING
+    conditions:
+      - trigger: IS_DAYTIME
+        effect: WEAKNESS
+        amp: 0
+      - trigger: IS_DAYTIME
+        effect: SLOWNESS
+        amp: 0
+      - trigger: IS_NIGHTTIME
+        effect: STRENGTH
+        amp: 0
+      - trigger: IS_NIGHTTIME
+        effect: NIGHT_VISION
+
+  deep_dweller:
+    display-name: "&1Deep Dweller"
+    description: "Creatures of the void. Thrive underground, suffer in light."
+    icon: SCULK
+    luckperms-group: "race_deepdweller"
+    stats:
+      max-health: 2
+      speed: 0.0
+      damage: 0.15
+      knockback-resistance: 0.0
+    passives:
+      - type: NIGHT_VISION
+    conditions:
+      - trigger: BELOW_Y
+        value: 0           # Y < 0 = deep dark level
+        effect: STRENGTH
+        amp: 1
+      - trigger: BELOW_Y
+        value: 0
+        effect: HASTE
+        amp: 1
+      - trigger: ABOVE_Y
+        value: 60
+        effect: DARKNESS   # disoriented in the overworld light
+        amp: 0
+      - trigger: ABOVE_Y
+        value: 60
+        effect: SLOWNESS
+        amp: 0
